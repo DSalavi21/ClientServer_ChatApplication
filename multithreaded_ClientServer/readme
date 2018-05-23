@@ -1,0 +1,9 @@
+build binaries using make utility. 
+
+1. Run Server
+    Inside -> server/
+              ./runserver
+  
+2. Run Client
+    Inside -> client/
+              ./runclient
