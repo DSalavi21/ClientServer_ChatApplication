@@ -4,6 +4,6 @@ build binaries using make utility.
     Inside -> server/
               ./runserver
   
-2. Run Client
+2. Run Client(on multile terminals)
     Inside -> client/
               ./runclient
