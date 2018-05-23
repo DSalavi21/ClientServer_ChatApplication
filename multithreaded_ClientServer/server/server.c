@@ -112,15 +112,15 @@ void *conn_handler( void *socket_desc )
                         break;
              
 		memset(msg,0,LENGTH);
-    printf("Enter data to be send to client(%d) : ",runningThread);
-    scanf(" %[^'\n']s",msg);
+    		printf("Enter data to be send to client(%d) : ",runningThread);
+    		scanf(" %[^'\n']s",msg);
 
-    no_of_bytes = send( sock, msg, LENGTH, 0);
-    if( no_of_bytes == -1 )
-    {
-        printf("\tError in sending\n");
-        break;
-    }           
+    		no_of_bytes = send( sock, msg, LENGTH, 0);
+    		if( no_of_bytes == -1 )
+    		{
+        		printf("\tError in sending\n");
+        		break;
+    		}           
 		if( strncmp(msg,"end",3) == 0 )
                         break;
    
