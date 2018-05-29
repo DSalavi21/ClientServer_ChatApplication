@@ -1,6 +1,7 @@
+
 #include "chatHeader.h"
 
-//static int runningThread = 0 ; 	// which thread is running status
+static int runningThread = 0 ; 	// which thread is running status
 
 int main()
 {
@@ -19,8 +20,8 @@ int main()
 	/* socket(), Get the Socket file descriptor */
 	if( ( sockfd = socket( AF_INET, SOCK_STREAM, 0 ) ) == -1 )
 	{
-		printf("\tERROR: Failed to obtain Socket Descriptor ( errno = %d )\n",errno);
-		exit(1);
+		printf("\tERROR : Failed to obtain Socket Descriptor ( error = %s )\n", strerror(errno));
+		return 1;
 	}
 	else 
 		printf("[Server] Obtaining socket descriptor successfully.\n");
@@ -47,8 +48,9 @@ int main()
 	/* bind(), Bind a special Port */
 	if( bind( sockfd, (struct sockaddr*)&server_addr, sizeof(struct sockaddr)) == -1 ) // cast server_addr to pointer type (struct sockaddr*)
 	{
-		printf("\tERROR: Failed to Bind Port ( errno = %d )\n",errno);
-		exit(1);
+		printf("\tERROR : Failed to Bind Port ( errno = %s )\n", strerror(errno) );
+		close(sockfd);
+		return 1;
 	}
 	else 
 		printf("[Server] Binded tcp port %d in addr 127.0.0.1 sucessfully.\n",PORT);
@@ -57,8 +59,9 @@ int main()
 	/* listen(), Listen remote connection/calling */
 	if( listen( sockfd, BACKLOG ) == -1 )	// BACKLOG : limlit to pending connections in queue 
 	{
-		printf("\tERROR: Failed to Listen Port ( errno = %d )\n",errno);
-		exit(1);
+		printf("\tERROR : Failed to Listen Port ( error = %s )\n", strerror(errno) );
+		close(sockfd);
+		return 1;
 	}
 	else
 		printf ("[Server] Listening the port %d successfully.\n", PORT);
@@ -76,19 +79,22 @@ int main()
 
         	if( pthread_create( &client_thread , NULL ,  conn_handler , (void*)new_sock) < 0)
         	{
-            		printf("\tError: could not create thread ( errno = %d )\n",errno);
-            		exit(1);
+            		printf("\tError : could not create thread ( error = %s )\n", strerror(errno) );
+            		close(clientsockfd);
+			close(sockfd);
+			return 1;
         	}
 
                	printf(" > Handler assigned\n");
 	}
 	if( clientsockfd < 0 )
 	{
-		printf("\tERROR: Obtaining new Socket Despcritor ( errno = %d )\n",errno);
-		exit(1);	
-	
+		printf("\tERROR : Obtaining new Socket Despcritor ( error = %s )\n", strerror(errno) );
+		close(sockfd);
+		return 1;
 	}
 
+	close(sockfd);
 	return 0;
 }
 
@@ -98,36 +104,37 @@ void *conn_handler( void *socket_desc )
 	//Get the socket descriptor
     	int sock = *(int*)socket_desc;
 	int no_of_bytes = -1 ;	// used in send(), recv()
-	static int runningThread = 0 ;  // which thread is running status
+	int tno = 0 ;
 
 	char msg[LENGTH];
 	memset(msg,0,LENGTH);
 
 	runningThread++;
+	tno = runningThread;
 
 	while( ( no_of_bytes = recv( sock, msg, LENGTH, 0 ) ) > 0 )
 	{
-		printf("Message got from client(%d): %s\n",runningThread,msg);
+		printf("\nMessage got from client(%d): %s\n",tno,msg);
 		if( strncmp(msg,"end",3) == 0 )
                         break;
              
 		memset(msg,0,LENGTH);
-    		printf("Enter data to be send to client(%d) : ",runningThread);
-    		scanf(" %[^'\n']s",msg);
+                printf("\nEnter data to be send to client(%d) : ",tno);
+                scanf(" %[^'\n']s",msg);
 
-    		no_of_bytes = send( sock, msg, LENGTH, 0);
-    		if( no_of_bytes == -1 )
-    		{
-        		printf("\tError in sending\n");
-        		break;
-    		}           
+                no_of_bytes = send( sock, msg, LENGTH, 0);
+                if( no_of_bytes == -1 )
+                {
+                        printf("\tError in sending\n");
+                        break;
+                }            
 		if( strncmp(msg,"end",3) == 0 )
                         break;
    
                 memset(msg,0,LENGTH);
 	}
 
-	printf("Terminating connection with client(%d)\n",runningThread);	
+	printf("Terminating connection with client(%d)\n",tno);	
     	free(socket_desc);
 	pthread_exit(NULL);
 }
