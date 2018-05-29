@@ -21,8 +21,8 @@ int main()
 	/* socket(), Get the Socket file descriptor */
 	if( ( sockfd = socket( AF_INET, SOCK_STREAM, 0 ) ) == -1 )
 	{
-		printf("\tERROR: Failed to obtain Socket Descriptor ( errno = %d )\n",errno);
-		exit(1);
+		printf("\tERROR : Failed to obtain Socket Descriptor ( error = %s )\n", strerror(errno) );
+		return 1;
 	}
 	else 
 		printf("[Server] Obtaining socket descriptor successfully.\n");
@@ -49,8 +49,9 @@ int main()
 	/* bind(), Bind a special Port */
 	if( bind( sockfd, (struct sockaddr*)&server_addr, sizeof(struct sockaddr)) == -1 ) // cast server_addr to pointer type (struct sockaddr*)
 	{
-		printf("\tERROR: Failed to Bind Port ( errno = %d )\n",errno);
-		exit(1);
+		printf("\tERROR : Failed to Bind Port ( error = %s )\n", strerror(errno) );
+		close(sockfd);
+		return 1;
 	}
 	else 
 		printf("[Server] Binded tcp port %d in addr 127.0.0.1 sucessfully.\n",PORT);
@@ -59,8 +60,9 @@ int main()
 	/* listen(), Listen remote connection/calling */
 	if( listen( sockfd, BACKLOG ) == -1 )	// BACKLOG : limlit to pending connections in queue 
 	{
-		printf("\tERROR: Failed to Listen Port ( errno = %d )\n",errno);
-		exit(1);
+		printf("\tERROR : Failed to Listen Port ( error = %s )\n", strerror(errno) );
+		close(sockfd);
+		return 1;
 	}
 	else
 		printf ("[Server] Listening the port %d successfully.\n", PORT);
@@ -71,8 +73,9 @@ int main()
 	/* accept(), Wait a connection, and obtain a new socket file despriptor for single connection */
 	if (( clientsockfd = accept(sockfd, (struct sockaddr*)&client_addr, &sin_size)) == -1) // cast client_addr to pointer type (struct sockaddr*)
 	{
-		printf("\tERROR: Obtaining new Socket Despcritor ( errno = %d )\n",errno);
-		exit(1);
+		printf("\tERROR : Obtaining new Socket Despcritor ( error = %s )\n", strerror(errno) );
+		close(sockfd);
+		return 1;
 	}
 	else
 		printf("[Server] Server has got connected from %s.\n", inet_ntoa(client_addr.sin_addr)); // convert Inet no. to ASCII		
@@ -110,7 +113,7 @@ int main()
 
 	}
 	close(clientsockfd);
-
+	close(sockfd);
 
 	return 0;
 }
