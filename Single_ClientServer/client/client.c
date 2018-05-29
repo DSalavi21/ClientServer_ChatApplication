@@ -16,8 +16,8 @@ int main()
 	/* socket(), Get the Socket file descriptor */
 	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
-		printf("\tERROR: Failed to obtain Socket Descriptor! ( errno = %d )\n",errno);
-		exit(1);
+		printf("\tERROR : Failed to obtain Socket Descriptor! ( error = %s )\n", strerror(errno) );
+		return 1;
 	}
 
 	/* Fill the socket address struct */
@@ -29,8 +29,9 @@ int main()
 	/* connect(), Try to connect the server */
 	if (connect(sockfd, (struct sockaddr *)&server_addr, sizeof(struct sockaddr)) == -1)
 	{
-		printf("\tERROR: Failed to connect to the host! ( errno = %d )\n",errno);
-		exit(1);
+		printf("\tERROR : Failed to connect to the host! ( error = %s )\n", strerror(errno) );
+		close(sockfd);
+		return 1;
 	}
 	else 
 		printf("[Client] Connected to server at port %d...ok!\n", PORT);	
