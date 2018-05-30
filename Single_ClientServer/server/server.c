@@ -88,7 +88,7 @@ int main()
         	if( no_of_bytes == -1 )
         	{
             		printf("\tError in receiving\n");
-            		exit(1);
+            		break;
         	}
                 if( strncmp(msg,"end",3) == 0 )
                         break;
@@ -103,13 +103,11 @@ int main()
         	if( no_of_bytes == -1 )
         	{
             		printf("\tError in sending\n");
-            		exit(1);
+            		break;
         	}    		
 	
 	       	if( strncmp(msg,"end",3) == 0 )
             		break;
-
-
 
 	}
 	close(clientsockfd);
